@@ -11,12 +11,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements MainContract.View{
+public class MainActivity extends AppCompatActivity implements MainContract.View {
 
     RecyclerView notesView = null;
     NotesViewAdapter adapter;
 
     MainPresenter presenter = null;
+
+
+    //Проверка совместной работы в GIT
+    int integer = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
