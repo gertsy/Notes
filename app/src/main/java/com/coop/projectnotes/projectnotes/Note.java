@@ -4,10 +4,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Note {
-    int id = 1;
 
-    String header = "Note" + String.valueOf(id);
-    String content = "lorem ipsum dolores";
+    //Перевел на аксессоры(Get) и мутаторы(set), вроде так правильно
+
+    private String header;
+    private String content;
+
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
 
     private Note(String header, String content){
         this.header = header;
@@ -15,7 +32,7 @@ public class Note {
     }
 
     public static Note createNote(String header, String content){
-        return new Note(header,content);
+        return new Note(header, content);
     }
 
 }

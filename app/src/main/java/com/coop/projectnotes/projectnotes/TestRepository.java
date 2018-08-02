@@ -3,7 +3,9 @@ package com.coop.projectnotes.projectnotes;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestRepository {
+public class TestRepository implements Repository {
+
+    //todo перетащить методы в интерфейс
 
     static List<Note> notes = new ArrayList<>();
     static int count = 1;
@@ -20,5 +22,13 @@ public class TestRepository {
         if(notes.size()<1)
             loadNotes(10);
         return notes;
+    }
+
+
+
+
+    @Override
+    public List<Note> getItems() {
+        return null;
     }
 }

@@ -1,10 +1,9 @@
-package com.coop.projectnotes.projectnotes;
+package com.coop.projectnotes.projectnotes.useful;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
-import android.widget.Adapter;
 
 public class RecyclerViewEmptySupport extends RecyclerView
 {

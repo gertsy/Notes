@@ -1,4 +1,4 @@
-package com.coop.projectnotes.projectnotes;
+package com.coop.projectnotes.projectnotes.Main;
 
 public interface MainContract {
 

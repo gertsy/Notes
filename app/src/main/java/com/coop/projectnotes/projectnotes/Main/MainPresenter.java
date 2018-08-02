@@ -1,4 +1,8 @@
-package com.coop.projectnotes.projectnotes;
+package com.coop.projectnotes.projectnotes.Main;
+
+import com.coop.projectnotes.projectnotes.Main.MainContract;
+import com.coop.projectnotes.projectnotes.Note;
+import com.coop.projectnotes.projectnotes.TestRepository;
 
 import java.util.List;
 
