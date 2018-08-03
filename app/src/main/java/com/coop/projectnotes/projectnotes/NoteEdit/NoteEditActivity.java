@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.coop.projectnotes.projectnotes.R;
+import com.coop.projectnotes.projectnotes.data.Note;
 
 import java.util.UUID;
 
@@ -24,10 +25,14 @@ public class NoteEditActivity extends AppCompatActivity implements NoteEditContr
         Bundle arguments = getIntent().getExtras();
         if (arguments != null) {
             UUID id = (UUID) arguments.get("noteId");
-
             if (id != null) {
-                Log.d(TAG, id.toString());
+                presenter.loadNote(id);
             }
         }
+    }
+
+    @Override
+    public void fillWithData(Note note) {
+        //Показать эти данные
     }
 }

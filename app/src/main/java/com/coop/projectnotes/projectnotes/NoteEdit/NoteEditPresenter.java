@@ -1,7 +1,10 @@
 package com.coop.projectnotes.projectnotes.NoteEdit;
 
 import com.coop.projectnotes.projectnotes.data.LocalRepository;
+import com.coop.projectnotes.projectnotes.data.Note;
 import com.coop.projectnotes.projectnotes.data.Repository;
+
+import java.util.UUID;
 
 public class NoteEditPresenter implements NoteEditContract.Presenter {
 
@@ -15,4 +18,9 @@ public class NoteEditPresenter implements NoteEditContract.Presenter {
         this.repository = LocalRepository.getInstance();
     }
 
+    @Override
+    public void loadNote(UUID id) {
+        Note temp = repository.getNote(id);
+        view.fillWithData(temp);
+    }
 }

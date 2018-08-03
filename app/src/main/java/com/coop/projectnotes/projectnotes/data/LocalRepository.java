@@ -2,6 +2,7 @@ package com.coop.projectnotes.projectnotes.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class LocalRepository implements Repository {
 
@@ -12,8 +13,16 @@ public class LocalRepository implements Repository {
         return SingletonHelper.Instance;
     }
 
-    //todo: Итак
-    //Если написал тут какой-нибудь метод, добавляй в Repository
+
+
+    //todo: Итак, разберись где и как хранить наши файлы. Пока используй сериализацию для текста.
+    //Для каждой заметки надо будет создавать папку, в которой будем хранить картинки, звук, еще что-то
+    //У каждой заметки есть UUID, его будем использовать для названий папки
+    //todo: надо как-то на эмуляторе настроить внешнее хранилище, на телефоне у меня вроде все работало нормально в старом приложении
+    //тут инфа https://developer.android.com/training/data-storage/files
+    //Использовать конечно нужно external, а не internal
+
+    //Если написал тут какой-нибудь метод, добавляй в Repository, все методы только там
     //Можно будет переписать на LinkedHashMap/TreeMap что-бы быстрее находить по id
 
 
@@ -25,23 +34,27 @@ public class LocalRepository implements Repository {
     private final String NOTES_FILENAME = "notes.json";
     private final String TAG = "LocalRepository";
 
-
-
     List<Note> notes;
 
     @Override
-    public List<Note> getItems() {
+    public List<Note> getNotes() {
         return notes;
     }
 
-
-
     @Override
     public void addNote(Note note) {
-
+        //
     }
 
+    @Override
+    public void deleteNote(UUID noteId) {
+        //
+    }
 
+    @Override
+    public Note getNote(UUID noteId) {
+        return null;
+    }
 
 
     private void degugDataCreate()
@@ -83,6 +96,7 @@ public class LocalRepository implements Repository {
 
 
     //Так я раньше сереализовал и сохранял в файл
+    //ObjectOutputStream сам из объекта делает json файл и читает обратно, изи
 
     /*@SuppressWarnings("unchecked")
     private void getLocallyStoredData()

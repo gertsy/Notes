@@ -36,7 +36,7 @@ public class MainPresenter implements MainContract.Presenter {
     public void loadNotes() {
         //Забираем у Repository данные
         //Просим View обновить данные о заметках
-        view.showNotes(repository.getItems());
+        view.showNotes(repository.getNotes());
     }
 
     //Кликнули на заметку

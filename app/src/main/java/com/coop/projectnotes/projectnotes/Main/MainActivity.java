@@ -1,6 +1,7 @@
 package com.coop.projectnotes.projectnotes.Main;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -15,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.coop.projectnotes.projectnotes.NoteEdit.NoteEditActivity;
 import com.coop.projectnotes.projectnotes.data.Note;
 import com.coop.projectnotes.projectnotes.R;
+import com.coop.projectnotes.projectnotes.useful.FabToolbar;
 import com.coop.projectnotes.projectnotes.useful.RecyclerViewEmptySupport;
 
 import java.io.File;
@@ -29,10 +32,25 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
 
+    //Идеи
+    //Покрасить заметки в разные цвета
+    //Анимировать заметки
+    //Мигаюющие заметки, означающие крайнюю важность записи
+
     private final String TAG = "MainActivity";
 
     RecyclerViewEmptySupport notesView = null;
     private MainContract.Presenter presenter;
+
+
+    //Элементы меню
+    FloatingActionButton fab;
+    FrameLayout bottomMenu;
+    boolean toolbarStatusOpen = false;
+    //Кнопки
+    View buttonNewNote;
+    View buttonNewPhoto;
+    View buttonNewRecord;
 
 
     @Override
@@ -41,30 +59,89 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         setContentView(R.layout.activity_main);
         presenter = new MainPresenter(this);
 
+        //Нижнее меню
+        buttonNewNote = findViewById(R.id.main_new_note);
+        buttonNewPhoto = findViewById(R.id.main_new_photo);
+        buttonNewRecord = findViewById(R.id.main_new_record);
+        fab = findViewById(R.id.main_fab);
+        bottomMenu = findViewById(R.id.main_bottom_menu);
+        //
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
         notesView = findViewById(R.id.notes);
-        notesView.setLayoutManager(new StaggeredGridLayoutManager(2,
-                                StaggeredGridLayoutManager.VERTICAL));
-
-
         View emptyView = findViewById(R.id.main_empty_view);
+
+
+
+
+
+
+
+        setSupportActionBar(toolbar);
+        notesView.setLayoutManager(new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL));
         notesView.setEmptyView(emptyView);
 
 
 
 
+
+        setListeners();
+
+
+
+        notesView.addItemDecoration(new SpacesItemDecoration(8));
         notesView.setAdapter(adapter);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
+        //addNote();
+
+
+    }
+
+    void setListeners()
+    {
+        //
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addNote();
+                if(!toolbarStatusOpen)
+                {
+                    FabToolbar.with(fab).setListener(new FabToolbar.OnFabMenuListener() {
+                        @Override
+                        public void onStartTransform() {
+                            //
+                        }
+
+                        @Override
+                        public void onEndTransform() {
+                            //
+                            toolbarStatusOpen = true;
+                        }
+                    }).transformTo(bottomMenu);
+                }
             }
         });
 
+        notesView.addOnScrollListener(new RecyclerView.OnScrollListener(){
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy){
+                if(toolbarStatusOpen)
+                {
+                    FabToolbar.with(fab).transformFrom(bottomMenu);
+                    toolbarStatusOpen = false;
+                }
+            }
+        });
+
+        //Кнопка добавления заметки
+        buttonNewNote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                presenter.addNote();
+            }
+        });
+
+        //Кнопка добавления заметки с фоткой
+
+        //Кнопка добавления заметки с звуковой записью
     }
 
     NotesViewAdapter adapter = new NotesViewAdapter(new ArrayList<Note>(), new NoteItemListener() {
@@ -85,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add:
-                addNote();
+                presenter.addNote();
                 return true;
 
             default:
@@ -94,11 +171,6 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
                 return super.onOptionsItemSelected(item);
 
         }
-    }
-
-    void addNote(){
-        presenter.addNote();
-        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -189,6 +261,33 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
     //callback, передадим его в адаптер для получения кликов
     public interface NoteItemListener {
         void onNoteClick(Note clickedNote);
+    }
+
+    public class SpacesItemDecoration extends RecyclerView.ItemDecoration
+    {
+        private int space;
+        SpacesItemDecoration(int space) {
+            this.space = space;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state)
+        {
+            super.getItemOffsets(outRect, view, parent, state);
+
+            outRect.left = space / 2;
+            outRect.right = space / 2;
+            outRect.top = space / 2;
+
+
+            /*if(settings.isOneColumnMode())
+            {
+                outRect.right = space / 2;
+                outRect.left = space / 2;
+                outRect.top = space / 4;
+                outRect.bottom = space / 4;
+            }*/
+        }
     }
 
 }
