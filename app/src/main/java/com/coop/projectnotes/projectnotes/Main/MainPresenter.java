@@ -1,18 +1,50 @@
 package com.coop.projectnotes.projectnotes.Main;
 
-import com.coop.projectnotes.projectnotes.Main.MainContract;
-import com.coop.projectnotes.projectnotes.Note;
-import com.coop.projectnotes.projectnotes.TestRepository;
+import android.annotation.SuppressLint;
 
-import java.util.List;
+import com.coop.projectnotes.projectnotes.data.LocalRepository;
+import com.coop.projectnotes.projectnotes.data.Note;
+import com.coop.projectnotes.projectnotes.data.Repository;
 
-public class MainPresenter implements MainContract {
+import static android.support.v4.util.Preconditions.checkNotNull;
+
+public class MainPresenter implements MainContract.Presenter {
+
+    private final String TAG = "MainPresenter";
+
+    private Repository repository;
+    private MainContract.View view;
+
+    public MainPresenter(MainContract.View view) {
+        this.view = view;
+        this.repository = LocalRepository.getInstance();
+        //Первичная загрузка заметок
+        loadNotes();
+    }
 
     public void addNote(){
-        TestRepository.addNote();
+        //Создаем новую заметку
+        Note temp = new Note();
+        //Просим Repository ее добавить
+        repository.addNote(temp);
+        //Просим View открыть Activity для редактирования новой заметки
+        view.showNoteEditUi(temp.getUUID());
     }
 
-    public List<Note> getNotes(){
-        return TestRepository.getNotes();
+    //Запрошено обновление данных
+    @Override
+    public void loadNotes() {
+        //Забираем у Repository данные
+        //Просим View обновить данные о заметках
+        view.showNotes(repository.getItems());
     }
+
+    //Кликнули на заметку
+    @Override
+    public void clickNote(Note item) {
+        //Просим View открыть Activity для редактирования заметки
+        view.showNoteEditUi(item.getUUID());
+    }
+
+
 }

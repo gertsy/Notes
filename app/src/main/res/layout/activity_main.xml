@@ -11,15 +11,23 @@
         android:id="@+id/toolbar"
         style="@style/Toolbar" />
 
-    <android.support.v7.widget.RecyclerView
+    <com.coop.projectnotes.projectnotes.useful.RecyclerViewEmptySupport
         android:id="@+id/notes"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="?attr/actionBarSize"
         app:layout_anchor="@+id/toolbar"
-        app:layout_anchorGravity="bottom|center">
+        app:layout_anchorGravity="bottom|center"
+        />
 
-    </android.support.v7.widget.RecyclerView>
+
+
+    <TextView
+        android:id="@+id/main_empty_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|center"
+        android:text="У вас нет заметок"/>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

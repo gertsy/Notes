@@ -1,5 +1,6 @@
 package com.coop.projectnotes.projectnotes.Main;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -8,6 +9,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,23 +17,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.coop.projectnotes.projectnotes.Note;
+import com.coop.projectnotes.projectnotes.NoteEdit.NoteEditActivity;
+import com.coop.projectnotes.projectnotes.data.Note;
 import com.coop.projectnotes.projectnotes.R;
+import com.coop.projectnotes.projectnotes.useful.RecyclerViewEmptySupport;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity implements MainContract.View {
 
-    RecyclerView notesView = null;
-    NotesViewAdapter adapter;
+    private final String TAG = "MainActivity";
 
-    MainPresenter presenter = null;
+    RecyclerViewEmptySupport notesView = null;
+    private MainContract.Presenter presenter;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        presenter = new MainPresenter(this);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -40,9 +48,13 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         notesView.setLayoutManager(new StaggeredGridLayoutManager(2,
                                 StaggeredGridLayoutManager.VERTICAL));
 
-        presenter = new MainPresenter();
 
-        adapter = new NotesViewAdapter(presenter.getNotes());
+        View emptyView = findViewById(R.id.main_empty_view);
+        notesView.setEmptyView(emptyView);
+
+
+
+
         notesView.setAdapter(adapter);
 
         FloatingActionButton fab = findViewById(R.id.fab);
@@ -54,6 +66,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         });
 
     }
+
+    NotesViewAdapter adapter = new NotesViewAdapter(new ArrayList<Note>(), new NoteItemListener() {
+
+        @Override
+        public void onNoteClick(Note clickedNote) {
+            presenter.clickNote(clickedNote);
+        }
+    });
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -81,12 +101,29 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void showNotes(List<Note> notes) {
+        adapter.replaceData(notes);
+    }
+
+
+
+    @Override
+    public void showNoteEditUi(UUID noteId) {
+        Intent intent = new Intent(MainActivity.this, NoteEditActivity.class);
+        intent.putExtra("noteId", noteId);
+        startActivity(intent);
+    }
+
 
     public class NotesViewAdapter extends RecyclerView.Adapter<NotesViewAdapter.NotesViewHolder> {
 
         List<Note> notes;
-        public NotesViewAdapter(List<Note> notes){
-            this.notes = notes;
+        private NoteItemListener listener;
+
+        public NotesViewAdapter(List<Note> notes, NoteItemListener listener){
+            setList(notes);
+            this.listener = listener;
         }
 
         @NonNull
@@ -99,28 +136,59 @@ public class MainActivity extends AppCompatActivity implements MainContract.View
 
         @Override
         public void onBindViewHolder(@NonNull NotesViewHolder holder, int position) {
-            holder.header.setText(notes.get(position).getHeader());
-            holder.content.setText(notes.get(position).getContent());
+            Note select = notes.get(position);
+
+            holder.header.setText(select.getHeader());
+            holder.content.setText(select.getContent());
         }
 
         @Override
         public int getItemCount() {
-            return notes.size();
+            return (notes != null ? notes.size() : 0);
         }
 
-        class NotesViewHolder extends RecyclerView.ViewHolder{
+        public void replaceData(List<Note> notes) {
+            setList(notes);
+            notifyDataSetChanged();
+        }
 
+        private void setList(List<Note> notes) {
+            this.notes = notes;
+        }
+
+        class NotesViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
             CardView note;
             TextView header;
             TextView content;
 
             public NotesViewHolder(View itemView) {
                 super(itemView);
-                note = itemView.findViewById(R.id.note);
-                header = itemView.findViewById(R.id.headerNote);
-                content = itemView.findViewById(R.id.contentNote);
+                itemView.setOnClickListener(this);
+                itemView.setLongClickable(true);
+                itemView.setOnLongClickListener(this);
+                note = itemView.findViewById(R.id.noteItemCardView);
+                header = itemView.findViewById(R.id.noteItemHeader);
+                content = itemView.findViewById(R.id.noteItemContent);
+            }
+
+            @Override
+            public void onClick(View v) {
+                int adapterPosition = getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    listener.onNoteClick(notes.get(adapterPosition));
+                }
+            }
+
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
             }
         }
+    }
+
+    //callback, передадим его в адаптер для получения кликов
+    public interface NoteItemListener {
+        void onNoteClick(Note clickedNote);
     }
 
 }
